@@ -1,7 +1,5 @@
 #!/bin/bash -l
 
-set -e 
-
 aws_comand_path=$(which aws)
 
 call_get_parameter ()
@@ -71,7 +69,9 @@ $aws_comand_path rds wait db-instance-available --db-instance-identifier $MASKIN
 
 $aws_comand_path rds modify-db-instance \
   --db-instance-identifier $MASKING_RDS_IDENTIFIER\
-  --master-user-password $MASKING_RDS_CONNECT_PASSWORD /dev/null 2>&1
+  --master-user-password $MASKING_RDS_CONNECT_PASSWORD > /dev/null 2>&1
+
+$aws_comand_path rds wait db-instance-available --db-instance-identifier $MASKING_RDS_IDENTIFIER
 
 MASKING_RDS_ENDPOINT=$(call_get_parameter SNAPSHOT_RDS_ENDPOINT | reject_double_quotation)
 
