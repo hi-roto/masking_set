@@ -50,7 +50,6 @@ main_snapshot_rds_identifier=$(get_latest_snapshot_rds_identifier $MAIN_CONNECTE
 main_snapshot_rds_identifier=$(echo $main_snapshot_rds_identifier | reject_double_quotation)
 
 MASKING_RDS_IDENTIFIER=$(call_get_parameter MASKING_RDS_IDENTIFIER | reject_double_quotation)
-MASKING_RDS_CONNECT_PASSWORD=$(call_get_parameter MASKING_RDS_CONNECT_PASSWORD | reject_double_quotation)
 
 # スナップショットからRDSを復元する
 $aws_comand_path rds --no-cli-pager restore-db-instance-from-db-snapshot  \
@@ -67,17 +66,18 @@ $aws_comand_path rds --no-cli-pager restore-db-instance-from-db-snapshot  \
 # RDSが作成するまで待機 
 $aws_comand_path rds wait db-instance-available --db-instance-identifier $MASKING_RDS_IDENTIFIER
 
+MASKING_RDS_CONNECT_PASSWORD=$(call_get_parameter MASKING_RDS_CONNECT_PASSWORD | reject_double_quotation)
+
 $aws_comand_path rds modify-db-instance \
-  --db-instance-identifier $MASKING_RDS_IDENTIFIER\
-  --master-user-password $MASKING_RDS_CONNECT_PASSWORD > /dev/null 2>&1
+    --db-instance-identifier $MASKING_RDS_IDENTIFIER \
+    --master-user-password $MASKING_RDS_CONNECT_PASSWORD > /dev/null 2>&1
 
-$aws_comand_path rds wait db-instance-available --db-instance-identifier $MASKING_RDS_IDENTIFIER
+sleep 1m
 
-MASKING_RDS_ENDPOINT=$(call_get_parameter SNAPSHOT_RDS_ENDPOINT | reject_double_quotation)
+SNAPSHOT_RDS_ENDPOINT=$(call_get_parameter SNAPSHOT_RDS_ENDPOINT | reject_double_quotation)
 
 # 復元RDSにSQL文を流し込んでデータをマスキング
-mysql -h$MASKING_RDS_ENDPOINT -uroot -p$MASKING_RDS_CONNECT_PASSWORD\
-  dokugaku_engineer < ~/masking_set/masking_dayly_query.sql 
+mysql -h$SNAPSHOT_RDS_ENDPOINT -uroot -p$MASKING_RDS_CONNECT_PASSWORD dokugaku_engineer < ~/masking_set/masking_dayly_query.sql 
 
 # マスキングRDSのDBインスタンス識別子を変更する
 $aws_comand_path rds modify-db-instance \
