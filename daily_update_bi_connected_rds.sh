@@ -43,7 +43,7 @@ if [ $? -eq 0 ]; then
   if [ $? -eq 0 ]; then
     echo "success_delete_old_maskingRDS" >> ~/masking_set/masking.log 2>&1
   else
-    echo "error_delete_old_maskingRDS" >> ./masking_set/masking.log 2>&1
+    echo "error_delete_old_maskingRDS" >> ~/masking_set/masking.log 2>&1
   fi
 
   $aws_comand_path rds wait db-instance-deleted --db-instance-identifier $BI_CONNECTED_RDS_IDENTIFIER
@@ -72,7 +72,7 @@ $aws_comand_path rds --no-cli-pager restore-db-instance-from-db-snapshot  \
 if [ $? -eq 0 ]; then
     echo "success_snapshot_restore_maskingRDS" >> ~/masking_set/masking.log 2>&1
 else
-    echo "error_snapshot_restore_maskingRDS" >> ./masking_set/masking.log 2>&1
+    echo "error_snapshot_restore_maskingRDS" >> ~/masking_set/masking.log 2>&1
 fi
 
 # RDSが作成するまで待機 
@@ -87,7 +87,7 @@ $aws_comand_path rds modify-db-instance \
 if [ $? -eq 0 ]; then
     echo "success_change_restore_maskingRDS_identifire_passwword" >> ~/masking_set/masking.log 2>&1
 else
-    echo "error_change_restore_maskingRDS_identifire_passwword" >> ./masking_set/masking.log 2>&1
+    echo "error_change_restore_maskingRDS_identifire_passwword" >> ~/masking_set/masking.log 2>&1
 fi
 
 sleep 1m
@@ -100,7 +100,7 @@ mysql -h$SNAPSHOT_RDS_ENDPOINT -uroot -p$MASKING_RDS_CONNECT_PASSWORD dokugaku_e
 if [ $? -eq 0 ]; then
     echo "success_masking_query" >> ~/masking_set/masking.log 2>&1
 else
-    echo "error_masking_query" >> ./masking_set/masking.log 2>&1
+    echo "error_masking_query" >> ~/masking_set/masking.log 2>&1
 fi
 
 # マスキングRDSのDBインスタンス識別子を変更する
@@ -112,5 +112,5 @@ $aws_comand_path rds modify-db-instance \
 if [ $? -eq 0 ]; then
     echo "Success_change_maskingRDS_identifier" >> ~/masking_set/masking.log 2>&1
 else
-    echo "Error_change_maskingRDS_identifier" >> ./masking_set/masking.log 2>&1
+    echo "Error_change_maskingRDS_identifier" >> ~/masking_set/masking.log 2>&1
 fi
