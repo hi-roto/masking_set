@@ -19,8 +19,7 @@ change_double_to_single_quotation ()
 
 get_latest_snapshot_rds_identifier () 
 {
-  $aws_comand_path rds describe-db-snapshots \
-  --query "reverse(sort_by(DBSnapshots[?DBInstanceIdentifier==$1],&SnapshotCreateTime))[0].DBSnapshotIdentifier"
+  $aws_comand_path rds describe-db-cluster-snapshots --query "reverse(sort_by(DBClusterSnapshots[?DBClusterIdentifier==$1],&SnapshotCreateTime))[0].DBClusterSnapshotIdentifier"
 }
 
 # 各パラメータを変数に代入
