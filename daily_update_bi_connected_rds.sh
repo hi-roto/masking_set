@@ -86,9 +86,10 @@ if [ $? -eq 0 ]; then
 fi
 
 SYNC_DB_ENDPOINT=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/SYNC_DB_ENDPOINT | reject_double_quotation)
+SYNC_DB_USERNAME=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/SYNC_DB_USERNAME | reject_double_quotation)
 
 # sync_AuroraにSQL文を流し込んでデータをマスキング
-mysql -h$SYNC_DB_ENDPOINT -uroot -p$ANALYTICS_DB_PASSWORD dokugaku_engineer < ~/masking_set/masking_dayly_query.sql 
+mysql -h$SYNC_DB_ENDPOINT -u$SYNC_DB_USERNAME -p$ANALYTICS_DB_PASSWORD dokugaku_engineer < ~/masking_set/masking_dayly_query.sql 
 
 if [ $? -eq 0 ]; then
     echo "success masking-query" >> ~/masking_set/masking.log 

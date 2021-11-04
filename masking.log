@@ -1,0 +1,3 @@
+ bash -x ~/masking_set/daily_update_bi_connected_rds.sh 2>> ~/masking_set/masking.log
+
+ de_master
