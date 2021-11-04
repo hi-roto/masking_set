@@ -1,8 +1,8 @@
-# マスキング処理の流れ
-1. BIと連携済みのRDSを削除（初回構築時は除く）
-2. 最新のスナップショットを復元
-3. 復元したRDSのMySqlパスワードを変更
-4. 復元したRDSに対してマスキング処理（SQL実行）
-5. マスキングしたRDSの識別子を変更して、BIツールと連携
+# マルチAZ対応のAuroraMySQLのDaily Update
+1. 最新のスナップショットを復元
+2. 復元したAuroraMySQLのMySQLパスワードを変更
+3. 復元したAuroraMySQLに対してマスキング処理（SQL実行）
+4. BIと連携済みのAuroraMySQLを削除（初回構築時は除く）
+5. 日次更新したマスキング済みのAuroraMySQL識別子を変更
 
-### 処理時間　約30分
+### total processing time 30m
