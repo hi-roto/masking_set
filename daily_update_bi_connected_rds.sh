@@ -26,8 +26,8 @@ get_latest_snapshot_rds_identifier ()
 }
 
 # 各パラメータを変数に代入
-ANALYTICS_RDS_IDENTIFIER=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/ANALYTICS_RDS_IDENTIFIER | reject_double_quotation)
-ANALYTICS_RDS_INSTANCE_IDENTIFIER=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/ANALYTICS_RDS_INSTANCE_IDENTIFIER | reject_double_quotation)
+ANALYTICS_DB_IDENTIFIER=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/ANALYTICS_DB_IDENTIFIER | reject_double_quotation)
+ANALYTICS_DB_INSTANCE_IDENTIFIER=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/ANALYTICS_DB_INSTANCE_IDENTIFIER | reject_double_quotation)
 ANALYTICS_DB_AVAILABILITY_ZONE=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/ANALYTICS_DB_AVAILABILITY_ZONE | reject_double_quotation)
 ANALYTICS_DB_SUBNET_GROUP_NAME=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/ANALYTICS_DB_SUBNET_GROUP_NAME | reject_double_quotation)
 ANYLITICS_DB_VPC_SECURITY_GROUP_ID=$(call_get_parameter /Prod/DokugakuEngineer/Analytics/ANYLITICS_DB_VPC_SECURITY_GROUP_ID | reject_double_quotation)
@@ -98,22 +98,22 @@ fi
 set +eu
 
 # BIツールと連携済みのAuroraがあれば削除する（初回構築時は除く）
-$aws_comand_path rds describe-db-instances --db-instance-identifier $ANALYTICS_RDS_INSTANCE_IDENTIFIER > /dev/null 2>&1
+$aws_comand_path rds describe-db-instances --db-instance-identifier $ANALYTICS_DB_INSTANCE_IDENTIFIER > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then 
 
   $aws_comand_path rds delete-db-instance \
-    --db-instance-identifier $ANALYTICS_RDS_INSTANCE_IDENTIFIER \
+    --db-instance-identifier $ANALYTICS_DB_INSTANCE_IDENTIFIER \
     --skip-final-snapshot > /dev/null 
 
   if [ $? -eq 0 ]; then
     echo "success deleted-old-db-instance" >> ~/masking_set/masking.log
   fi
 
-  $aws_comand_path rds wait db-instance-deleted --db-instance-identifier $ANALYTICS_RDS_INSTANCE_IDENTIFIER
+  $aws_comand_path rds wait db-instance-deleted --db-instance-identifier $ANALYTICS_DB_INSTANCE_IDENTIFIER
 
   $aws_comand_path rds delete-db-cluster \
-    --db-cluster-identifier $ANALYTICS_RDS_IDENTIFIER \
+    --db-cluster-identifier $ANALYTICS_DB_IDENTIFIER \
     --skip-final-snapshot > /dev/null
   
   if [ $? -eq 0 ]; then
@@ -132,7 +132,7 @@ sleep 2m
 
 $aws_comand_path rds modify-db-cluster \
     --db-cluster-identifier $SYNC_DB_IDENTIFIER \
-    --new-db-cluster-identifier $ANALYTICS_RDS_IDENTIFIER \
+    --new-db-cluster-identifier $ANALYTICS_DB_IDENTIFIER \
     --apply-immediately > /dev/null
 
 if [ $? -eq 0 ]; then
@@ -143,7 +143,7 @@ sleep 2m
 
 $aws_comand_path rds modify-db-instance \
     --db-instance-identifier $SYNC_DB_INSTANCE_IDENTIFIER \
-    --new-db-instance-identifier $ANALYTICS_RDS_INSTANCE_IDENTIFIER \
+    --new-db-instance-identifier $ANALYTICS_DB_INSTANCE_IDENTIFIER \
     --apply-immediately > /dev/null
 
 if [ $? -eq 0 ]; then
